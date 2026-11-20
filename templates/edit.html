@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Edit Case</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; background-color: #f4f4f4; }
+        .form-container { background: white; padding: 20px; border-radius: 5px; max-width: 500px; margin: auto; }
+        input, textarea { width: 100%; padding: 8px; margin: 5px 0 15px 0; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; }
+        button { background-color: #007BFF; color: white; padding: 10px 15px; border: none; border-radius: 4px; cursor: pointer; }
+        .cancel { display: block; text-align: center; margin-top: 10px; color: #dc3545; text-decoration: none; }
+    </style>
+</head>
+<body>
+    <div class="form-container">
+        <h2>Edit Case ID: {{ case[0] }}</h2>
+        <form action="/update/{{ case[0] }}" method="POST">
+            <input type="text" name="customer_name" value="{{ case[1] }}" required>
+            <input type="text" name="phone_model" value="{{ case[2] }}" required>
+            <input type="text" name="imei" value="{{ case[3] }}" required>
+            <input type="text" name="phone_number" value="{{ case[4] }}" required>
+            <input type="text" name="date_lost" value="{{ case[5] }}" required>
+            <input type="text" name="location_lost" value="{{ case[6] }}" required>
+            <textarea name="notes" rows="3">{{ case[8] }}</textarea>
+            <button type="submit">Update Case</button>
+            <a href="/" class="cancel">Cancel</a>
+        </form>
+    </div>
+</body>
+</html>
