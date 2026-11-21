@@ -1,6 +1,7 @@
 from flask import Flask, render_template, request, redirect, url_for, session, jsonify
 import sqlite3
 from datetime import datetime
+import os
 
 app = Flask(__name__)
 app.secret_key = 'moonga_secret_key_123'
@@ -123,7 +124,6 @@ def view_case(case_id):
     case_info = cursor.fetchone()
     cursor.execute("SELECT * FROM case_notes WHERE case_id = ? ORDER BY id DESC", (case_id,))
     notes_list = cursor.fetchall()
-    # Fetch all GPS tracking history for this case
     cursor.execute("SELECT * FROM gps_tracking WHERE case_id = ? ORDER BY id DESC", (case_id,))
     gps_history = cursor.fetchall()
     conn.close()
@@ -160,4 +160,6 @@ def receive_location(case_id):
     return jsonify({"status": "success"})
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    # Render requires the app to bind to 0.0.0.0 and use the PORT environment variable
+    port = int(os.environ.get("PORT", 10000))
+    app.run(host='0.0.0.0', port=port)
