@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Case Details</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; background-color: #f4f4f4; }
+        .container { background: white; padding: 20px; border-radius: 5px; max-width: 800px; margin: auto; }
+        .note-box { border-left: 4px solid #17a2b8; background: #e9ecef; padding: 10px; margin-bottom: 10px; border-radius: 4px; }
+        .gps-box { border-left: 4px solid #10b981; background: #ecfdf5; padding: 10px; margin-bottom: 10px; border-radius: 4px; }
+        input, textarea { width: 100%; padding: 8px; margin: 5px 0 15px 0; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; }
+        button { background-color: #17a2b8; color: white; padding: 10px 15px; border: none; border-radius: 4px; cursor: pointer; }
+        .back-btn { display: inline-block; background: #6c757d; color: white; padding: 10px 15px; text-decoration: none; border-radius: 4px; margin-bottom: 20px; }
+        .track-btn { display: inline-block; background: #10b981; color: white; padding: 10px 15px; text-decoration: none; border-radius: 4px; margin-bottom: 20px; margin-left: 10px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <a href="/" class="back-btn">&larr; Back to Dashboard</a>
+        <a href="/track/{{ case[0] }}" target="_blank" class="track-btn">Open Customer Tracking Link</a>
+        
+        <h1>Case ID: {{ case[0] }} - {{ case[1] }}</h1>
+        <p><strong>Device:</strong> {{ case[2] }}</p>
+        <p><strong>IMEI:</strong> {{ case[3] }}</p>
+        <p><strong>Status:</strong> {{ case[7] }}</p>
+        <p><strong>Initial Notes:</strong> {{ case[8] }}</p>
+        
+        <hr>
+        <h2>Investigation Log</h2>
+        <form action="/add_note/{{ case[0] }}" method="POST">
+            <textarea name="note_text" placeholder="Type a new update here..." rows="3" required></textarea>
+            <button type="submit">Add Update to Case</button>
+        </form>
+
+        <div style="margin-top: 20px;">
+            {% for note in notes %}
+                <div class="note-box">
+                    <p><strong>{{ note[3] }}</strong></p> 
+                    <p>{{ note[2] }}</p> 
+                </div>
+            {% endfor %}
+        </div>
+
+        <hr>
+        <h2>GPS Tracking History</h2>
+        <div style="margin-top: 20px;">
+            {% for ping in gps_history %}
+                <div class="gps-box">
+                    <p><strong>Time:</strong> {{ ping[4] }}</p>
+                    <p><strong>Lat/Lon:</strong> {{ ping[2] }}, {{ ping[3] }}</p>
+                    <a href="https://www.google.com/maps?q={{ ping[2] }},{{ ping[3] }}" target="_blank" style="background: #10b981; color: white; padding: 5px 10px; text-decoration: none; border-radius: 4px; display: inline-block; font-size: 12px;">View on Map</a>
+                </div>
+            {% else %}
+                <p style="color: #dc3545;">No GPS data received yet.</p>
+            {% endfor %}
+        </div>
+    </div>
+</body>
+</html>

@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, redirect, url_for, session
+from flask import Flask, render_template, request, redirect, url_for, session, jsonify
 import sqlite3
 from datetime import datetime
 
@@ -76,6 +76,7 @@ def delete_case(case_id):
     conn = sqlite3.connect('mprs_cases.db')
     cursor = conn.cursor()
     cursor.execute("DELETE FROM case_notes WHERE case_id = ?", (case_id,))
+    cursor.execute("DELETE FROM gps_tracking WHERE case_id = ?", (case_id,))
     cursor.execute("DELETE FROM cases WHERE id = ?", (case_id,))
     conn.commit()
     conn.close()
@@ -122,8 +123,11 @@ def view_case(case_id):
     case_info = cursor.fetchone()
     cursor.execute("SELECT * FROM case_notes WHERE case_id = ? ORDER BY id DESC", (case_id,))
     notes_list = cursor.fetchall()
+    # Fetch all GPS tracking history for this case
+    cursor.execute("SELECT * FROM gps_tracking WHERE case_id = ? ORDER BY id DESC", (case_id,))
+    gps_history = cursor.fetchall()
     conn.close()
-    return render_template('view_case.html', case=case_info, notes=notes_list)
+    return render_template('view_case.html', case=case_info, notes=notes_list, gps_history=gps_history)
 
 @app.route('/add_note/<int:case_id>', methods=['POST'])
 def add_note(case_id):
@@ -138,5 +142,22 @@ def add_note(case_id):
     conn.close()
     return redirect(url_for('view_case', case_id=case_id))
 
+@app.route('/track/<int:case_id>')
+def track_page(case_id):
+    return render_template('track.html', case_id=case_id)
+
+@app.route('/api/location/<int:case_id>', methods=['POST'])
+def receive_location(case_id):
+    data = request.get_json()
+    lat = data.get('latitude')
+    lon = data.get('longitude')
+    current_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    conn = sqlite3.connect('mprs_cases.db')
+    cursor = conn.cursor()
+    cursor.execute("INSERT INTO gps_tracking (case_id, latitude, longitude, timestamp) VALUES (?, ?, ?, ?)", (case_id, lat, lon, current_time))
+    conn.commit()
+    conn.close()
+    return jsonify({"status": "success"})
+
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=10000)
+    app.run(debug=True)
