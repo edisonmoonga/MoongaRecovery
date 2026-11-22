@@ -159,7 +159,23 @@ def receive_location(case_id):
     conn.close()
     return jsonify({"status": "success"})
 
+# --- NEW CUSTOMER PORTAL ROUTE ---
+@app.route('/status', methods=['GET', 'POST'])
+def public_status():
+    case_info = None
+    error = None
+    if request.method == 'POST':
+        imei_search = request.form['imei']
+        conn = sqlite3.connect('mprs_cases.db')
+        cursor = conn.cursor()
+        cursor.execute("SELECT * FROM cases WHERE imei = ?", (imei_search,))
+        case_info = cursor.fetchone()
+        conn.close()
+        if not case_info:
+            error = "No case found with that IMEI. Please check the number and try again."
+            
+    return render_template('public_status.html', case=case_info, error=error)
+
 if __name__ == '__main__':
-    # Render requires the app to bind to 0.0.0.0 and use the PORT environment variable
     port = int(os.environ.get("PORT", 10000))
     app.run(host='0.0.0.0', port=port)
