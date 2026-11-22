@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MPRS Customer Portal</title>
+    <style>
+        body { font-family: Arial, sans-serif; background-color: #f4f4f4; padding: 20px; }
+        .card { background: white; padding: 30px; border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.1); max-width: 500px; margin: auto; margin-top: 50px; text-align: center; }
+        h1 { color: #1e293b; }
+        p { color: #475569; line-height: 1.5; }
+        input { width: 100%; padding: 15px; margin: 15px 0; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; font-size: 16px; }
+        button { background-color: #3b82f6; color: white; padding: 15px; border: none; border-radius: 4px; cursor: pointer; font-size: 16px; font-weight: bold; width: 100%; }
+        button:hover { background-color: #2563eb; }
+        .error { color: #dc3545; font-weight: bold; margin-top: 15px; }
+        .result-box { background: #ecfdf5; border-left: 4px solid #10b981; padding: 20px; margin-top: 30px; text-align: left; border-radius: 4px; }
+        .status-open { color: #dc3545; font-weight: bold; }
+        .status-recovered { color: #10b981; font-weight: bold; }
+    </style>
+</head>
+<body>
+    <div class="card">
+        <h1>Moonga Recovery Portal</h1>
+        <p>Enter your phone's IMEI number below to check the status of your recovery case.</p>
+        
+        <form method="POST" action="/status">
+            <input type="text" name="imei" placeholder="Enter IMEI Number" required>
+            <button type="submit">Check Case Status</button>
+        </form>
+
+        {% if error %}
+            <p class="error">{{ error }}</p>
+        {% endif %}
+
+        {% if case %}
+            <div class="result-box">
+                <h2>Case Details Found</h2>
+                <p><strong>Customer:</strong> {{ case[1] }}</p>
+                <p><strong>Device:</strong> {{ case[2] }}</p>
+                <p><strong>Date Reported:</strong> {{ case[5] }}</p>
+                <p><strong>Status:</strong> 
+                    {% if case[7] == 'Open' %}
+                        <span class="status-open">Open (Under Investigation)</span>
+                    {% else %}
+                        <span class="status-recovered">Recovered!</span>
+                    {% endif %}
+                </p>
+            </div>
+        {% endif %}
+    </div>
+</body>
+</html>
