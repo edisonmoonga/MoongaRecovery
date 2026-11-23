@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MPRS Location Tracker</title>
+    <style>
+        body { font-family: Arial, sans-serif; background-color: #f4f4f4; padding: 20px; text-align: center; }
+        .card { background: white; padding: 30px; border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.1); max-width: 400px; margin: auto; margin-top: 50px; }
+        h2 { color: #1e293b; }
+        p { color: #475569; line-height: 1.5; }
+        button { background-color: #3b82f6; color: white; padding: 15px 20px; border: none; border-radius: 5px; cursor: pointer; font-size: 16px; font-weight: bold; width: 100%; margin-top: 20px; }
+        button:hover { background-color: #2563eb; }
+        .status { margin-top: 20px; font-weight: bold; color: #10b981; }
+        .error { margin-top: 20px; font-weight: bold; color: #dc3545; }
+        .pulse { animation: pulse 2s infinite; }
+        @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.5; } 100% { opacity: 1; } }
+    </style>
+</head>
+<body>
+    <div class="card">
+        <h2>Moonga Phone Recovery System</h2>
+        <p>Your investigator has requested a location update for Case <strong>#{{ case_id }}</strong>.</p>
+        <p>Please click the button below and tap <strong>"Allow"</strong> to share your live location.</p>
+        
+        <button id="shareBtn" onclick="startTracking()">Start Live Tracking</button>
+        
+        <div id="status" class="status"></div>
+        <div id="error" class="error"></div>
+    </div>
+
+    <script>
+        let trackingInterval;
+        let wakeLock = null;
+
+        async function requestWakeLock() {
+            try {
+                if ('wakeLock' in navigator) {
+                    wakeLock = await navigator.wakeLock.request('screen');
+                    console.log('Screen Wake Lock is active');
+                }
+            } catch (err) {
+                console.log(`Wake Lock error: ${err.name}, ${err.message}`);
+            }
+        }
+
+        function startTracking() {
+            if (navigator.geolocation) {
+                document.getElementById("shareBtn").disabled = true;
+                document.getElementById("shareBtn").innerText = "Tracking Active (Do not close)";
+                document.getElementById("shareBtn").classList.add("pulse");
+                
+                // Request wake lock to keep screen on
+                requestWakeLock();
+                
+                // Get location immediately with high accuracy
+                const options = { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 };
+                navigator.geolocation.getCurrentPosition(sendLocation, showError, options);
+                
+                // Then get location every 10 seconds
+                trackingInterval = setInterval(function() {
+                    navigator.geolocation.getCurrentPosition(sendLocation, showError, options);
+                }, 10000); 
+                
+            } else {
+                document.getElementById("error").innerHTML = "Geolocation is not supported by this browser.";
+            }
+        }
+
+        function sendLocation(position) {
+            var lat = position.coords.latitude;
+            var lon = position.coords.longitude;
+            var accuracy = position.coords.accuracy;
+            
+            document.getElementById("status").innerHTML = "✅ Live tracking active. (Accuracy: ~" + Math.round(accuracy) + "m)";
+            
+            fetch('/api/location/{{ case_id }}', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ latitude: lat, longitude: lon })
+            })
+            .then(response => response.json())
+            .then(data => {
+                console.log("Location sent to MPRS.");
+            })
+            .catch((error) => {
+                console.error("Error sending location:", error);
+            });
+        }
+
+        function showError(error) {
+            var errorDiv = document.getElementById("error");
+            switch(error.code) {
+                case error.PERMISSION_DENIED:
+                    errorDiv.innerHTML = "You denied the request for Geolocation. Please allow it to help us find your phone."
+                    break;
+                case error.POSITION_UNAVAILABLE:
+                    errorDiv.innerHTML = "Location information is unavailable. Please ensure GPS is turned on."
+                    break;
+                case error.TIMEOUT:
+                    errorDiv.innerHTML = "The request to get user location timed out."
+                    break;
+                case error.UNKNOWN_ERROR:
+                    errorDiv.innerHTML = "An unknown error occurred."
+                    break;
+            }
+        }
+    </script>
+</body>
+</html>
