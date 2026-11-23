@@ -1,5 +1,5 @@
 {
-  "name": "Moonga Recovery System",
+  "name": "Moonga Phone Recovery System",
   "short_name": "MPRS",
   "start_url": "/",
   "display": "standalone",
@@ -7,9 +7,10 @@
   "theme_color": "#1e293b",
   "icons": [
     {
-      "src": "https://cdn-icons-png.flaticon.com/512/2991/2991148.png",
+      "src": "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxMDAgMTAwIj48Y2lyY2xlIGN4PSI1MCIgY3k9IjUwIiByPSI1MCIgZmlsbD0iIzFlMjkzYiIvPjx0ZXh0IHg9IjUwJSIgeT0iNTAlIiBkb21pbmFudC1iYXNlbGluZT0iY2VudHJhbCIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZm9udC1zaXplPSI0MCIgZm9udC1mYW1pbHk9IkFyaWFsLCBzYW5zLXNlcmlmIiBmb250LXdlaWdodD0iYm9sZCIgZmlsbD0iIzEwYjk4MSI+TS1QUlM8L3RleHQ+PC9zdmc+",
       "sizes": "512x512",
-      "type": "image/png"
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
     }
   ]
 }
