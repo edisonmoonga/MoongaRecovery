@@ -6,7 +6,6 @@
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
         body { display: flex; height: 100vh; background-color: #f4f6f9; }
         
-        /* Sidebar Styles */
         .sidebar { width: 250px; background-color: #1e293b; color: white; display: flex; flex-direction: column; }
         .sidebar h2 { padding: 20px; text-align: center; background-color: #0f172a; border-bottom: 1px solid #334155; font-size: 20px; letter-spacing: 1px; }
         .sidebar a { padding: 15px 20px; text-decoration: none; color: #cbd5e1; display: block; border-bottom: 1px solid #334155; transition: 0.3s; }
@@ -14,35 +13,30 @@
         .sidebar .logout-btn { margin-top: auto; background-color: #dc3545; color: white; text-align: center; font-weight: bold; }
         .sidebar .logout-btn:hover { background-color: #c82333; }
 
-        /* Main Content Styles */
         .main-content { flex: 1; padding: 30px; overflow-y: auto; }
         h1 { color: #1e293b; margin-bottom: 20px; font-size: 28px; }
         
-        /* Search Bar */
         .search-bar { display: flex; gap: 10px; margin-bottom: 20px; background: white; padding: 15px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
         .search-bar input { flex: 1; padding: 10px; border: 1px solid #cbd5e1; border-radius: 4px; outline: none; }
         .search-bar button { padding: 10px 20px; background: #3b82f6; color: white; border: none; border-radius: 4px; cursor: pointer; font-weight: bold; }
         .search-bar a { padding: 10px 20px; background: #64748b; color: white; text-decoration: none; border-radius: 4px; font-weight: bold; display: flex; align-items: center;}
 
-        /* Table Styles */
         .table-container { background: white; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); overflow-x: auto; }
         table { width: 100%; border-collapse: collapse; text-align: left; }
         th { background-color: #f8fafc; color: #475569; padding: 15px; border-bottom: 2px solid #e2e8f0; font-size: 14px; text-transform: uppercase; letter-spacing: 0.5px; }
         td { padding: 15px; border-bottom: 1px solid #e2e8f0; color: #334155; font-size: 14px; }
         tr:hover { background-color: #f1f5f9; }
         
-        /* Status Badges */
         .badge-open { background-color: #fee2e2; color: #dc2626; padding: 5px 10px; border-radius: 20px; font-weight: bold; font-size: 12px; }
         .badge-recovered { background-color: #dcfce7; color: #16a34a; padding: 5px 10px; border-radius: 20px; font-weight: bold; font-size: 12px; }
         
-        /* Action Buttons */
-        .action-btn { padding: 6px 10px; text-decoration: none; border-radius: 4px; font-size: 12px; font-weight: bold; margin-right: 5px; display: inline-block; }
+        .action-btn { padding: 6px 10px; text-decoration: none; border-radius: 4px; font-size: 12px; font-weight: bold; margin-right: 5px; display: inline-block; border: none; cursor: pointer; }
         .btn-view { background-color: #e0f2fe; color: #0284c7; }
         .btn-edit { background-color: #fef08a; color: #854d0e; }
         .btn-recover { background-color: #dcfce7; color: #16a34a; }
         .btn-delete { background-color: #fee2e2; color: #dc2626; }
+        .btn-copy { background-color: #e2e8f0; color: #1e293b; }
         
-        /* Form Styles */
         .form-section { background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); margin-bottom: 30px; }
         .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
         .form-grid input, .form-grid textarea { width: 100%; padding: 10px; border: 1px solid #cbd5e1; border-radius: 4px; }
@@ -52,20 +46,16 @@
 </head>
 <body>
 
-    <!-- SIDEBAR -->
     <div class="sidebar">
         <h2>MPRS</h2>
         <a href="/">Dashboard</a>
-        <a href="#" onclick="alert('Feature coming soon!')">Analytics</a>
-        <a href="#" onclick="alert('Feature coming soon!')">Settings</a>
+        <a href="/status" target="_blank">Customer Portal</a>
         <a href="/logout" class="logout-btn">Logout</a>
     </div>
 
-    <!-- MAIN CONTENT -->
     <div class="main-content">
         <h1>Case Management Dashboard</h1>
 
-        <!-- SEARCH BAR -->
         <div class="search-bar">
             <form action="/" method="GET" style="display: flex; flex: 1; gap: 10px;">
                 <input type="text" name="search" placeholder="Search by Customer Name or IMEI..." value="{{ search_query }}">
@@ -74,7 +64,6 @@
             </form>
         </div>
 
-        <!-- NEW CASE FORM -->
         <div class="form-section">
             <h2 style="margin-bottom: 15px; color: #1e293b; font-size: 20px;">Register New Case</h2>
             <form action="/add" method="POST" class="form-grid">
@@ -89,7 +78,6 @@
             </form>
         </div>
 
-        <!-- CASES TABLE -->
         <div class="table-container">
             <table>
                 <thead>
@@ -119,6 +107,7 @@
                         <td>
                             <a href="/case/{{ case[0] }}" class="action-btn btn-view">Notes</a>
                             <a href="/edit/{{ case[0] }}" class="action-btn btn-edit">Edit</a>
+                            <button onclick="copyLink('{{ case[0] }}')" class="action-btn btn-copy">Copy Track Link</button>
                             {% if case[7] == 'Open' %}
                                 <a href="/recover/{{ case[0] }}" class="action-btn btn-recover">Recover</a>
                             {% endif %}
@@ -131,5 +120,15 @@
         </div>
     </div>
 
+    <script>
+        function copyLink(caseId) {
+            var link = window.location.origin + "/track/" + caseId;
+            navigator.clipboard.writeText(link).then(function() {
+                alert("Tracking link copied to clipboard!\n\n" + link);
+            }, function(err) {
+                alert("Failed to copy link: " + err);
+            });
+        }
+    </script>
 </body>
 </html>
