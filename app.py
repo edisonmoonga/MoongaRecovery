@@ -8,7 +8,7 @@ app = Flask(__name__)
 app.secret_key = 'moonga_secret_key_123'
 
 # DATABASE CONNECTION
-DATABASE_URL = "postgresql://postgres:moonga225588.@db.npeakgkqzjhxnnvsdnjx.supabase.co:5432/postgres"
+DATABASE_URL = "postgresql://postgres:moonga225588.@db.pfdgxtsvtxopytjerbrt.supabase.co:5432/postgres"
 
 def get_db_connection():
     conn = psycopg2.connect(DATABASE_URL)
@@ -51,6 +51,7 @@ def init_db():
     cur.close()
     conn.close()
 
+# Run the database setup when the app starts
 init_db()
 
 @app.route('/manifest.json')
