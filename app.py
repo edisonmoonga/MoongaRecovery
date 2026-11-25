@@ -8,7 +8,8 @@ app = Flask(__name__)
 app.secret_key = 'moonga_secret_key_123'
 
 # DATABASE CONNECTION
-DATABASE_URL = "postgresql://postgres:moonga225588.@db.pfdgxtsvtxopytjerbrt.supabase.co:5432/postgres"
+DATABASE_URL = "postgresql://postgres.pfdgxtsvtxopytjerbrt:moonga225588.@aws-0-eu-central-1.pooler.supabase.com:5432/postgres"
+
 
 def get_db_connection():
     conn = psycopg2.connect(DATABASE_URL)
